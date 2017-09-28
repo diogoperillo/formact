@@ -31,6 +31,7 @@ export default class Input extends Component {
     removeField: PropTypes.func,
     valueChanged: PropTypes.func,
     submitted: PropTypes.func,
+    getInitialValue: PropTypes.func,
   }
 
   state: {
@@ -41,7 +42,11 @@ export default class Input extends Component {
     super(props, context)
 
     this.state = {
-      value: props.value || props.defaultValue || '',
+      value:
+        props.value ||
+        props.defaultValue ||
+        (context && context.getInitialValue(props.name)) ||
+        '',
     }
   }
 

@@ -14,9 +14,10 @@ import type {
 
 export default class Form extends Component {
   props: {
-    onSubmit: (e: SyntheticEvent, payload: FormSubmitPayload) => void,
+    model?: ?Object,
+    children?: ElementChildren,
+    onSubmit?: (e: SyntheticEvent, payload: FormSubmitPayload) => void,
     onChange?: (payload: FormChangePayload) => void,
-    children: ElementChildren,
   }
 
   static childContextTypes = {
@@ -24,6 +25,7 @@ export default class Form extends Component {
     removeField: PropTypes.func,
     valueChanged: PropTypes.func,
     submitted: PropTypes.func,
+    getInitialValue: PropTypes.func,
   }
 
   state: {
@@ -43,10 +45,19 @@ export default class Form extends Component {
       removeField: this.removeField,
       valueChanged: this.valueChanged,
       submitted: this.checkSubmitted,
+      getInitialValue: this.getInitialValue,
     }
   }
 
-  checkSubmitted = () => {
+  getInitialValue = (name: FieldName): FieldValue => {
+    if (this.props.model) {
+      return this.props.model[name]
+    }
+
+    return null
+  }
+
+  checkSubmitted = (): boolean => {
     return this.state.submitted
   }
 
@@ -103,7 +114,7 @@ export default class Form extends Component {
     })
   }
 
-  validateField = (field: FieldName) => {
+  validateField = (field: FieldName): String => {
     const { validate } = this.validators[field]
     if (!validate || typeof validate !== `function`) {
       return ''
@@ -111,7 +122,7 @@ export default class Form extends Component {
     return validate(this.fields[field])
   }
 
-  isValid = () => {
+  isValid = (): boolean => {
     return !Object.keys(this.errors).find(field => this.errors[field])
   }
 
